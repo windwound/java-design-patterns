@@ -2,6 +2,7 @@ package com.iluwatar.aggregator.microservices;
 
 import org.apache.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -34,14 +35,25 @@ public class WebLogAspect {
         logger.info("IP : " + request.getRemoteAddr());
         logger.info("CLASS_METHOD : " + joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
         logger.info("ARGS : " + Arrays.toString(joinPoint.getArgs()));
-        if(joinPoint.getArgs().length > 0)
-        {
-            Product p = (Product)joinPoint.getArgs()[0];
-            logger.info(p.getOrderId());
-        }
 
     }
-
+    @Around("webLog()")
+    public  Object Around(ProceedingJoinPoint joinPoint)
+    {
+        logger.info("around before");
+        Object obj = null;
+        Object[] args = joinPoint.getArgs();
+        long startTime = System.currentTimeMillis();
+        try {
+            obj = joinPoint.proceed(args);
+        } catch (Throwable e) {
+            logger.error("统计某方法执行耗时环绕通知出错", e);
+        }
+        long endTime = System.currentTimeMillis();
+        logger.info(joinPoint.getSignature().getName() + "耗时:" +  (endTime - startTime) + "ms" );
+        logger.info("around end");
+        return obj;
+    }
     @AfterReturning(returning = "ret", pointcut = "webLog()")
     public void doAfterReturning(Object ret) throws Throwable {
         // 处理完请求，返回内容
