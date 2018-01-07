@@ -54,4 +54,9 @@ public class ProductInformationClientImpl implements ProductInformationClient {
     }
     return response;
   }
+  @Override
+  public  String getProductTitle(Product p)
+  {
+      return  Long.toString(p.getOrderId());
+  }
 }

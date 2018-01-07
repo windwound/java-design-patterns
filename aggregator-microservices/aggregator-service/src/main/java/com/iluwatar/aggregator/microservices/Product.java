@@ -54,4 +54,14 @@ public class Product {
     this.productInventories = productInventories;
   }
 
+    public long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(long orderId) {
+        this.orderId = orderId;
+    }
+
+    public long orderId;
+
 }

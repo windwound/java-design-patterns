@@ -24,8 +24,12 @@ package com.iluwatar.aggregator.microservices;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * The aggregator aggregates calls on various micro-services, collects
@@ -50,7 +54,11 @@ public class Aggregator {
   @RequestMapping("/product")
   public Product getProduct() {
     Product product = new Product();
-    product.setTitle(informationClient.getProductTitle());
+    product.setOrderId(1111);
+    RequestAttributes ra = RequestContextHolder.getRequestAttributes();
+    HttpServletRequest request = ((ServletRequestAttributes)ra).getRequest();
+    request.getSession().setAttribute("orderid", 1111);
+    product.setTitle(informationClient.getProductTitle(product));
     product.setProductInventories(inventoryClient.getProductInventories());
     return product;
   }
